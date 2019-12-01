@@ -1,0 +1,32 @@
+{
+  "name": "agritech19",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "client": "npm start --prefix client",
+    "server": "nodemon server.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "dependencies": {
+    "@azure/storage-blob": "^10.3.0",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "~1.4.3",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "dotenv": "^5.0.1",
+    "ejs": "^3.0.1",
+    "ejs-mate": "^3.0.0",
+    "express": "^4.16.4",
+    "hbs": "~4.0.1",
+    "into-stream": "^3.1.0",
+    "morgan": "^1.9.1",
+    "multer": "^1.4.1",
+    "nodemon": "^2.0.1",
+    "serve-favicon": "~2.4.5"
+  },
+  "author": "Arun Subramanian",
+  "license": "ISC"
+}

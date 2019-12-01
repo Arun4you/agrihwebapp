@@ -1,0 +1,57 @@
+React Native project for cross-platform mobile development of IBM's Rewards and Recognition Programs
+
+Use this file for notes on the project. Ideas would include:
+
+- Coding standards
+- Deployment process
+- Reporting structure
+
+Index:
+
+1. Coding Standards
+2. Deployment Process
+
+1. Coding Standards
+
+This project is the first of hopefully many cross-platform mobile projects at BI Worldwide. We don't want to rush code out that just works. We want to not only have something maintainable, but something that can be used as an example for future projects.
+
+As such, we want to do a good job writing clean code that adheres to BI's standards. If there isn't a standard? Let's make one!
+
+Import statement rules:
+
+We categorize imports and sort them. First, we list the packages imported. Then, we list the imported files from the project. Then, we list the imported styles.
+
+Each of these categories are alphabetized. If you import more than one thing from a file, alphabetize the items imported.
+
+Style rules:
+
+Keep non-dynamic styles out of component files. Put them in style files stored in the styles directory in the top level of the project. Typically name the file after the component.
+Re-use styles as much as possible. Do not paste the exact same styles in multiple files.
+Keep things like colors and alignments in their own files. You should not be putting "center" in 100 different places, for example, or setting a color to "#123ABC."
+
+General Coding Rules:
+
+DRY: https://en.wikipedia.org/wiki/Don%27t_repeat_yourself. It makes the code base very hard to maintain and cruft increases over time. Literally, if you paste any code ever, you should pause and ask yourself if you should refactor it. I'm serious. Whenever you hit Ctrl+V, stop and think.
+
+No magic strings or magic numbers. You should never write something like this:
+
+if(myItems.length > 25)
+...
+
+What is 25? What does this "magic number" signify? You should say something like this:
+
+if(myItems.length > pageLength)
+...
+
+Where pageLength is defined elsewhere. Explain the significance of 25 and store it either in the method if it's used once, in the file if it's used within the component or somewhere more universal if it will be used across files.
+
+Be consistent in things like spacing, parentheses, single- or double-quotes, etc. It doesn't matter 99% of the time, but it matters to be consistent. It's best to have a formatter that operates on every save and to agree - even if it isn't exactly what you want
+
+Get rid of boiler plate stuff and other unnecessary code. Common issues in violation of this:
+
+Creating a pointless constructor method in a component. constructor(props) { super(props) }, for example, is a given. It happens already. Same with adding in this.state = {}. That's already happening in the super class.
+Using brackets and a return statement for a one-line function. Instead of myFunction = () => { return blah }, just say myFunction = () => blah.
+Don't use unnecessary brackets. For example, {'My String'} is the same as My String.
+There's no need for parentheses around the single JSX Element being returned. Not sure why this is such a common practice. Removing unnecessary brackets and parentheses can decrease indenting heavily and make the code much easier to read
+
+2. Deployment Process
