@@ -8,6 +8,7 @@ npm-debug.*
 *.mobileprovision
 *.idea
 *.orig.*
+*.env
 web-build/
 web-report/
 yarn.lock
