@@ -17,14 +17,6 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 
-// const Storage = multer.diskStorage({
-//   destination(req, file, callback) {
-//     callback(null, "./images");
-//   },
-//   filename(req, file, callback) {
-//     callback(null, `${file.fieldname}_${Date.now()}_${file.originalname}`);
-//   }
-// });
 const inMemoryStorage = multer.memoryStorage();
 const uploadStrategy = multer({ storage: inMemoryStorage }).array("image");
 
@@ -56,9 +48,9 @@ const getBlobName = originalName => {
 router.post("/upload", uploadStrategy, async (req, res) => {
   try {
     console.log("upload called");
-    console.log("req:", req);
-    console.log("req body:", req.body);
-    console.log("req route files:", req.files[0]);
+    // console.log("req:", req);
+    // console.log("req body:", req.body);
+    console.log("req route files:", req.files);
     const aborter = Aborter.timeout(30 * ONE_MINUTE);
     const blobName = getBlobName(req.files[0].originalname);
     const stream = getStream(req.files[0].buffer);

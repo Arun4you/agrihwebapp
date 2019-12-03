@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Image
 } from "react-native";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import { Block, Button, Input, Text } from "../../components";
@@ -14,8 +15,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import * as moment from "moment";
 
-// export const APP_URL = "http://localhost:3003";
-export const APP_URL = "http://192.168.0.117:3003";
+export const APP_URL =
+  "https://uploadclaimform.azurewebsites.net/api/claimupload";
+// export const APP_URL = "http://192.168.0.117:3003";
 
 const Home = props => {
   const title = "AgriTech";
@@ -36,8 +38,10 @@ const Home = props => {
   const [webInputFormatEndDate, setwebInputFormatEndDate] = useState(
     new Date()
   );
+  const [webImageUri, setWebImageUri] = useState("");
 
   const [inputEndDate, setinputEndDate] = useState(new Date());
+  const [webImageUpload, setWebImageUpload] = useState({});
 
   useEffect(() => {
     console.log("step ", step);
@@ -54,7 +58,8 @@ const Home = props => {
   };
 
   const onImageSelect = result => {
-    console.log("result ", result.uri);
+    console.log("result ", result);
+    console.log("result uri", result.uri);
     if (result.uri) {
       setimageUri(result.uri);
       setImage64(result.base64);
@@ -103,16 +108,30 @@ const Home = props => {
   };
 
   const uploadImageAsync = async uri => {
-    console.log("uri ", uri);
-    const apiUrl = `${APP_URL}/upload`;
-    const imgName = uri.split("ImagePicker/");
-    const uriParts = uri.split(".");
-    const fileType = `image/${uriParts[uriParts.length - 1]}`;
-    console.log("fileType ", fileType, imgName[1]);
-    let options = {
-      method: "post",
-      body: createFormData(uri, imgName[1], fileType)
-    };
+    console.log("uploadImageAsync uri ", uri);
+    let options;
+    const apiUrl = `${APP_URL}`;
+    // const apiUrl = `${APP_URL}/upload`;
+    if (Platform.OS === "web") {
+      console.log("Platform.OS ", Platform.OS);
+      const data = new FormData();
+      data.append("image", uri);
+      options = {
+        mode: "no-cors",
+        method: "post",
+        body: data
+      };
+    } else {
+      const imgName = uri.split("ImagePicker/");
+      const uriParts = uri.split(".");
+      const fileType = `image/${uriParts[uriParts.length - 1]}`;
+      console.log("fileType ", fileType, imgName[1]);
+      options = {
+        method: "post",
+        body: createFormData(uri, imgName[1], fileType)
+      };
+    }
+    console.log("API called ", apiUrl);
     return fetch(apiUrl, options).catch(err => {
       console.log("err ", err, err.message);
     });
@@ -132,7 +151,12 @@ const Home = props => {
   const handleSubmit = async () => {
     console.log("handleSubmit ");
     console.log("imageUri ", imageUri);
-    const uploadResponse = await uploadImageAsync(imageUri);
+    let uploadResponse;
+    if (Platform.OS === "web") {
+      uploadResponse = await uploadImageAsync(webImageUpload);
+    } else {
+      uploadResponse = await uploadImageAsync(imageUri);
+    }
     console.log("upload completed ", uploadResponse);
     // uploadResult = await uploadResponse.json();
     // console.log(uploadResult.location);
@@ -213,6 +237,12 @@ const Home = props => {
     console.log(parseDateForStore(inputEndDate));
   }, [inputEndDate]);
 
+  const uploadWebImage = async (e, method) => {
+    if (method === "multer") {
+      setWebImageUri(URL.createObjectURL(e.target.files[0]));
+      setWebImageUpload(e.target.files[0]);
+    }
+  };
   return (
     <KeyboardAvoidingView
       style={Platform.OS === "web" ? null : styles.login}
@@ -241,11 +271,24 @@ const Home = props => {
                 Please upload the claim form
               </Text>
               <Block center middle>
-                <UploadPhoto
-                  onSelection={buttonIndex => onSelection(buttonIndex)}
-                  imageUri={imageUri}
-                  onImageSelect={result => onImageSelect(result)}
-                />
+                {Platform.OS === "web" ? (
+                  <>
+                    <input
+                      type="file"
+                      onChange={e => uploadWebImage(e, "multer")}
+                    />
+                    <Image
+                      style={{ height: 100, width: 100 }}
+                      source={webImageUri}
+                    />
+                  </>
+                ) : (
+                  <UploadPhoto
+                    onSelection={buttonIndex => onSelection(buttonIndex)}
+                    imageUri={imageUri}
+                    onImageSelect={result => onImageSelect(result)}
+                  />
+                )}
               </Block>
             </>
           ) : null}
@@ -253,7 +296,7 @@ const Home = props => {
           {step === 3 ? (
             <>
               <Text center h2>
-                Please confirm the form details.
+                Please confirm the submitted form details below.
               </Text>
             </>
           ) : null}
@@ -348,7 +391,15 @@ const Home = props => {
             <Button
               style={{ flex: 1, marginHorizontal: 5 }}
               gradient
-              onPress={() => nextStep()}
+              onPress={async () => {
+                console.log("next press");
+                nextStep();
+                // const resp = await handleSubmit();
+                // if (resp) {
+                //   console.log("handleSubmit Response recieved");
+                //   nextStep();
+                // }
+              }}
             >
               {false ? (
                 <ActivityIndicator size="small" color="white" />
